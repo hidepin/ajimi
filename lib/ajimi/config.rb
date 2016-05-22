@@ -21,6 +21,7 @@ module Ajimi
       source
       target
       check_root_path
+      detail_paths
       pruned_paths
       ignored_paths
       ignored_contents

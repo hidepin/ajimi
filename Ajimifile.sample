@@ -22,6 +22,10 @@ target "target.example.com", {
 # check setting
 check_root_path "/"
 
+detail_paths [
+  "/etc",
+]
+
 pruned_paths [
   "/dev",
   "/proc",

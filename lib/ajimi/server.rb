@@ -28,10 +28,14 @@ module Ajimi
       backend.command_exec(cmd)
     end
     
-    def find(dir, find_max_depth = nil, pruned_paths = [], enable_nice = nil)
+    def find(dir, find_max_depth = nil, detail_paths = [], pruned_paths = [], enable_nice = nil)
       enable_nice = @options[:enable_nice] if enable_nice.nil?
-      cmd = build_find_cmd(dir, find_max_depth, pruned_paths, enable_nice)
+      cmd = build_find_cmd(dir, find_max_depth, detail_paths + pruned_paths, enable_nice, false)
       stdout = command_exec(cmd)
+      detail_paths.map do |detail_path|
+        cmd = build_find_cmd(detail_path, find_max_depth, pruned_paths, enable_nice, true)
+        stdout += command_exec(cmd)
+      end
       stdout.split(/\n/).map {|line| line.chomp }.sort
     end
 
@@ -51,13 +55,18 @@ module Ajimi
 
     private
 
-    def build_find_cmd(dir, find_max_depth  = nil, pruned_paths = [], enable_nice = false)
+    def build_find_cmd(dir, find_max_depth  = nil, pruned_paths = [], enable_nice = false, enable_detail = false)
+      p "#{pruned_paths} #{find_max_depth}"
       cmd = "sudo"
       cmd += " nice -n 19 ionice -c 2 -n 7" if enable_nice
       cmd += " find #{dir} -ls"
       cmd += " -maxdepth #{find_max_depth}" if find_max_depth
       cmd += build_pruned_paths_option(pruned_paths)
-      cmd += " | awk  '{printf \"%s, %s, %s, %s, %s, %s %s %s\\n\", \$11, \$3, \$5, \$6, \$7, \$8, \$9, \$10 }'"
+      if enable_detail
+        cmd += " | awk  '{printf \"%s, %s, %s, %s, %s, %s %s %s\\n\", \$11, \$3, \$5, \$6, \$7, \$8, \$9, \$10 }'"
+      else
+        cmd += " | awk  '{printf \"%s, %s, %s, %s, %s, -\\n\", \$11, \$3, \$5, \$6, \$7}'"
+      end
     end
 
     def build_pruned_paths_option(pruned_paths = [])
