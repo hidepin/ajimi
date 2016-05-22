@@ -57,7 +57,7 @@ module Ajimi
       cmd += " find #{dir} -ls"
       cmd += " -maxdepth #{find_max_depth}" if find_max_depth
       cmd += build_pruned_paths_option(pruned_paths)
-      cmd += " | awk  '{printf \"%s, %s, %s, %s, %s\\n\", \$11, \$3, \$5, \$6, \$7}'"
+      cmd += " | awk  '{printf \"%s, %s, %s, %s, %s, %s %s %s\\n\", \$11, \$3, \$5, \$6, \$7, \$8, \$9, \$10 }'"
     end
 
     def build_pruned_paths_option(pruned_paths = [])

@@ -51,7 +51,17 @@ module Ajimi
       puts message if @config[:verbose]
     end
 
+    def remove_dir_date(result_find)
+      result_find.each do |result|
+        unless result[result.index(', ') + 2] == '-'
+          result.sub!(/,[^,]*$/, ', -')
+        end
+      end
+    end
+
     def diff_entries(source_find, target_find)
+      source_find = remove_dir_date(source_find)
+      target_find = remove_dir_date(target_find)
       diffs = ::Diff::LCS.diff(source_find, target_find)
       diffs.map do |diff|
         diff.map do |change|
